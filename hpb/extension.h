@@ -320,14 +320,6 @@ absl::Status SetExtension(
   return ::hpb::SetExtension(Ptr(message), id, std::forward<Extension>(value));
 }
 
-template <typename T, typename Extension,
-          typename = hpb::internal::EnableIfHpbClassThatHasExtensions<T>>
-absl::Status SetExtension(
-    T* message, const ::hpb::internal::ExtensionIdentifier<T, Extension>& id,
-    Ptr<Extension> value) {
-  return ::hpb::SetExtension(Ptr(message), id, value);
-}
-
 template <typename T, typename Extendee, typename Extension,
           typename = hpb::internal::EnableIfHpbClassThatHasExtensions<T>>
 absl::StatusOr<typename internal::UpbExtensionTrait<Extension>::ReturnType>
