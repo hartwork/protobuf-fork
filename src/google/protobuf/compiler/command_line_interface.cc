@@ -69,6 +69,7 @@
 #include "absl/types/span.h"
 #include "google/protobuf/compiler/code_generator.h"
 #include "google/protobuf/compiler/importer.h"
+#include "google/protobuf/compiler/notices.h"
 #include "google/protobuf/compiler/plugin.pb.h"
 #include "google/protobuf/compiler/retention.h"
 #include "google/protobuf/compiler/subprocess.h"
@@ -2004,7 +2005,8 @@ bool CommandLineInterface::ParseArgument(const char* arg, std::string* name,
       *name == "--experimental_editions" ||
       *name == "--print_free_field_numbers" ||
       *name == "--experimental_allow_proto3_optional" ||
-      *name == "--deterministic_output" || *name == "--fatal_warnings") {
+      *name == "--deterministic_output" || *name == "--fatal_warnings" ||
+      *name == "--notices") {
     // HACK:  These are the only flags that don't take a value.
     //   They probably should not be hard-coded like this but for now it's
     //   not worth doing better.
@@ -2322,6 +2324,9 @@ CommandLineInterface::InterpretArgument(const std::string& name,
     // life-ruining bugs *anyways*. As such, there is a reasonable probability
     // that there isn't another thread kicking environment variables at this
     // moment.
+  } else if (name == "--notices") {
+    std::cout << notices_text << std::endl;
+    return PARSE_ARGUMENT_DONE_AND_EXIT;
 
 #ifdef _WIN32
     ::_putenv(absl::StrCat(io::Printer::kProtocCodegenTrace, "=yes").c_str());
@@ -2502,7 +2507,8 @@ Parse PROTO_FILES and generate output based on the options given:
                               are counted as occupied fields numbers.
   --enable_codegen_trace      Enables tracing which parts of protoc are
                               responsible for what codegen output. Not supported
-                              by all backends or on all platforms.)";
+                              by all backends or on all platforms.
+  --notices                   Show notice file and exit.)";
   if (!plugin_prefix_.empty()) {
     std::cout << R"(
   --plugin=EXECUTABLE         Specifies a plugin executable to use.
